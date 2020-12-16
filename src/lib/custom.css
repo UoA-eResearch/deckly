@@ -1,5 +1,7 @@
 body,
-html, #root, .title {
+html,
+#root,
+.title {
     width: 100%;
     height: 100%;
     margin: 0;
@@ -9,6 +11,10 @@ html, #root, .title {
 
 #plots {
     overflow-y: auto;
+}
+
+.js-plotly-plot {
+    display: inline-block;
 }
 
 .title {

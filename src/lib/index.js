@@ -27,14 +27,21 @@ const INITIAL_VIEW_STATE = {
 function aggregate(items) {
     var result = {}
     for (var item of items) {
-        for (var k in item.properties) {
-            var v = item.properties[k]
+        for (var k in item) {
+            var v = item[k]
             if (typeof (v) == "object") {
                 if (!result[k]) result[k] = {}
                 for (var sk in v) {
-                    if (typeof (v[sk]) != "number") continue;
-                    if (!result[k][sk]) result[k][sk] = 0;
-                    result[k][sk] += v[sk]
+                    if (typeof (v[sk]) == "object") {
+                        for (var ssk in v[sk]) {
+                            if (!result[k][sk]) result[k][sk] = {};
+                            if (!result[k][sk][ssk]) result[k][sk][ssk] = 0;
+                            result[k][sk][ssk] += v[sk][ssk]
+                        }
+                    } else if (typeof(v[sk]) == "number") {
+                        if (!result[k][sk]) result[k][sk] = 0;
+                        result[k][sk] += v[sk]
+                    }
                 }
             }
         }
@@ -50,8 +57,10 @@ class DecklyComponent extends React.Component {
         this.state = {
             items: [],
             accessor: this.props.colorBy,
-            isLoaded: false
+            isLoaded: false,
+            per: false
         }
+        this.handleInputChange = this.handleInputChange.bind(this);
     }
     componentDidMount() {
         document.title = this.props.title;
@@ -62,9 +71,19 @@ class DecklyComponent extends React.Component {
                 this.setState({
                     isLoaded: true,
                     items: json.features,
-                    aggregate: aggregate(json.features)
+                    aggregate: aggregate(json.features.map(f => f.properties))
                 })
             });
+    }
+
+    handleInputChange(event) {
+      const target = event.target;
+      const value = target.type === 'checkbox' ? target.checked : target.value;
+      const name = target.name;
+  
+      this.setState({
+        [name]: value
+      });
     }
 
     render() {
@@ -101,11 +120,18 @@ class DecklyComponent extends React.Component {
                         </ReflexElement>
                         <ReflexSplitter/>
                         <ReflexElement className="plots">
+                            <div id="controls">
+                                <input name="per" type="checkbox" checked={this.state.per} onChange={this.handleInputChange} />
+                                <label htmlFor="per">{this.props.perText}</label>
+                            </div>
                             {
                                 this.props.plots.map(p => {
                                     return <Plot
+                                        key={p.id}
                                         data={p.data(this.state.aggregate)}
                                         layout={p.layout}
+                                        useResizeHandler={true}
+                                        style={p.style}
                                     />
                                 })
                             }
