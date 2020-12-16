@@ -139,7 +139,8 @@ class DecklyComponent extends React.Component {
                                         key={p.id}
                                         data={p.data(this.state.hoverInfo.object ? this.state.hoverInfo.object.properties : this.state.aggregate)}
                                         layout={{
-                                            title: p.layout.title(this.state.hoverInfo.object)
+                                            title: p.layout.title(this.state.hoverInfo.object),
+                                            barmode: 'stack',
                                         }}
                                         useResizeHandler={true}
                                         style={p.style}
