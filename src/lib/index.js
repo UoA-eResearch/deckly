@@ -54,6 +54,7 @@ class DecklyComponent extends React.Component {
         }
     }
     componentDidMount() {
+        document.title = this.props.title;
         fetch(this.props.data)
             .then(results => results.json())
             .then(json => {

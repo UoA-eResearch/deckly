@@ -1,6 +1,7 @@
 {
   "name": "deckly",
   "version": "0.1.0",
+  "homepage": "./",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -12,11 +13,13 @@
     "build-examples": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "build": "rimraf dist && NODE_ENV=production babel src/lib --out-dir dist --copy-files --ignore __tests__,spec.js,test.js,__snapshots__"
+    "build": "rimraf dist && NODE_ENV=production babel src/lib --out-dir dist --copy-files --ignore __tests__,spec.js,test.js,__snapshots__",
+    "deploy": "gh-pages -d build"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^10.0.0",
+    "gh-pages": "^2.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "^4.0.1",
