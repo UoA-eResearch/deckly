@@ -58,7 +58,8 @@ class DecklyComponent extends React.Component {
             items: [],
             accessor: this.props.colorBy,
             isLoaded: false,
-            per: false
+            per: false,
+            hoverInfo: {}
         }
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -102,7 +103,8 @@ class DecklyComponent extends React.Component {
                 lineWidthMinPixels: 1,
                 getFillColor: f => COLOR_SCALE(this.state.accessor(f)).rgb(),
                 getLineColor: [0, 0, 0],
-                pickable: true
+                pickable: true,
+                onHover: info => this.setState({hoverInfo: info})
             })
         ];
 
@@ -116,6 +118,13 @@ class DecklyComponent extends React.Component {
                         <ReflexElement className="map">
                             <DeckGL initialViewState={INITIAL_VIEW_STATE} controller={true} layers={layers}>
                                 <StaticMap mapStyle={BASEMAP.DARK_MATTER} />
+                                {
+                                    this.state.hoverInfo.object && (
+                                        <div className="tooltip" style={{position: 'absolute', zIndex: 1, pointerEvents: 'none', left: this.state.hoverInfo.x, top: this.state.hoverInfo.y}}>
+                                        { this.props.hoverMessage(this.state.hoverInfo.object) + ": " + this.props.colorBy(this.state.hoverInfo.object).toLocaleString() }
+                                        </div>
+                                    )
+                                }
                             </DeckGL>
                         </ReflexElement>
                         <ReflexSplitter/>
@@ -128,8 +137,10 @@ class DecklyComponent extends React.Component {
                                 this.props.plots.map(p => {
                                     return <Plot
                                         key={p.id}
-                                        data={p.data(this.state.aggregate)}
-                                        layout={p.layout}
+                                        data={p.data(this.state.hoverInfo.object ? this.state.hoverInfo.object.properties : this.state.aggregate)}
+                                        layout={{
+                                            title: p.layout.title(this.state.hoverInfo.object)
+                                        }}
                                         useResizeHandler={true}
                                         style={p.style}
                                     />

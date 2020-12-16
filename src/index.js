@@ -4,7 +4,8 @@ import Deckly from "./lib";
 Deckly({
     title: "Cancer distribution in NZ",
     data: "https://uoa-eresearch.github.io/cancermap/data/TALB_2018.geojson",
-    colorBy: d => d.properties.cancer["total 18+ all cancertotal2016-2018"],
+    colorBy: d => d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
+    hoverMessage: d => d.properties.TALB2018_1,
     perText: "Display cancer/smoking values as per 100K people",
     plots: [{
         id: "cancertypes",
@@ -26,7 +27,7 @@ Deckly({
             }
         ],
         layout: {
-            title: "Cancer types in NZ from 2016-2018",
+            title: d => `Cancer types in ${d ? d.properties.TALB2018_1 : "NZ"} from 2016-2018`,
             barmode: 'stack',
         }
     },
@@ -50,7 +51,7 @@ Deckly({
             }
         ],
         layout: {
-            title: "Smoking in NZ as per the 2018 census",
+            title: d => `Smoking in ${d ? d.properties.TALB2018_1 : "NZ"} as per the 2018 census`,
             barmode: 'stack',
         }
     },
@@ -71,7 +72,7 @@ Deckly({
             }
         ],
         layout: {
-            title: "Age distribution in NZ as per the 2018 census",
+            title: d => `Age distribution in ${d ? d.properties.TALB2018_1 : "NZ"} as per the 2018 census`,
             barmode: 'stack',
         }
     }]

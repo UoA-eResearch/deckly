@@ -27,3 +27,8 @@ html,
     text-shadow: 2px 2px #000000;
     font-weight: normal;
 }
+
+.tooltip {
+    background-color: white;
+    padding: 15px;
+}
