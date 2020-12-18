@@ -3,10 +3,7 @@ module.exports = {
   npm: {
     esModules: true,
     umd: {
-      global: 'Deckly',
-      externals: {
-        react: 'React'
-      }
+      global: 'Deckly'
     }
   }
 }

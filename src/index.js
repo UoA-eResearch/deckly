@@ -156,5 +156,5 @@ class DecklyComponent extends React.Component {
 }
 
 export default function Deckly(props) {
-    render(<DecklyComponent {...props} />, document.querySelector('#demo'));
+    render(<DecklyComponent {...props} />, props.container || document.querySelector('#demo'));
 }
