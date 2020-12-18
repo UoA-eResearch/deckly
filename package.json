@@ -17,14 +17,13 @@
     "start": "nwb serve-react-demo",
     "test": "nwb test-react",
     "test:coverage": "nwb test-react --coverage",
-    "test:watch": "nwb test-react --server",
-    "deploy": "gh-pages -d demo/dist"
+    "test:watch": "nwb test-react --server"
   },
   "dependencies": {
     "chroma-js": "^2.1.0",
     "deck.gl": "^8.3.11",
-    "plotly.js": "^1.58.2",
-    "react-map-gl": "^5.2.11",
+    "plotly.js": "^1.58.3",
+    "react-map-gl": "^6.0.1",
     "react-plotly.js": "^2.5.1",
     "react-reflex": "^3.1.0"
   },
@@ -32,7 +31,6 @@
     "react": "16.x"
   },
   "devDependencies": {
-    "gh-pages": "^3.1.0",
     "nwb": "0.25.x",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"

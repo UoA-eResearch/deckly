@@ -5,5 +5,10 @@ module.exports = {
     umd: {
       global: 'Deckly'
     }
+  },
+  webpack: {
+    extractCSS: {
+      filename: 'deckly.css'
+    }
   }
 }
