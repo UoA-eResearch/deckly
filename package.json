@@ -25,7 +25,8 @@
     "plotly.js": "^1.58.3",
     "react-map-gl": "^6.0.1",
     "react-plotly.js": "^2.5.1",
-    "react-reflex": "^3.1.0"
+    "react-reflex": "^3.1.0",
+    "topojson-client": "^3.1.0"
   },
   "peerDependencies": {
     "react": "16.x"

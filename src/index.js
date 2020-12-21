@@ -4,6 +4,7 @@ import { DeckGL } from '@deck.gl/react';
 import { GeoJsonLayer } from '@deck.gl/layers';
 import { StaticMap } from 'react-map-gl';
 import { BASEMAP } from '@deck.gl/carto';
+import { feature } from 'topojson-client';
 import chroma from "chroma-js";
 import Plot from 'react-plotly.js';
 import "./custom.css";
@@ -69,6 +70,10 @@ class DecklyComponent extends React.Component {
             .then(results => results.json())
             .then(json => {
                 console.log(json);
+                if (json.type == "Topology") {
+                    json = feature(json, Object.keys(json.objects)[0])
+                    console.log(json);
+                }
                 this.setState({
                     isLoaded: true,
                     items: json.features,
