@@ -7,6 +7,7 @@ import { BASEMAP } from '@deck.gl/carto';
 import { feature } from 'topojson-client';
 import chroma from "chroma-js";
 import Plot from 'react-plotly.js';
+import AbsoluteLegend from './AbsoluteLegend';
 import "./custom.css";
 
 import {
@@ -86,7 +87,6 @@ class DecklyComponent extends React.Component {
       const target = event.target;
       const value = target.type === 'checkbox' ? target.checked : target.value;
       const name = target.name;
-  
       this.setState({
         [name]: value
       });
@@ -130,6 +130,7 @@ class DecklyComponent extends React.Component {
                                         </div>
                                     )
                                 }
+                                <AbsoluteLegend title={this.props.legendTitle} colorScale={COLOR_SCALE} limits={limits} steps={5}/>
                             </DeckGL>
                         </ReflexElement>
                         <ReflexSplitter/>

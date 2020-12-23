@@ -33,3 +33,30 @@ html,
     background-color: white;
     padding: 15px;
 }
+
+.legend {
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+    max-width: 300px;
+    line-height: 18px;
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+    padding: 20px;
+    margin-top: 30px !important;
+}
+.legend i {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.7;
+    clear: left;
+}
+.legend i.circle {
+    border-radius: 50%;
+}
+.legend h4 {
+    margin: 0 0 5px;
+    color: white;
+}
