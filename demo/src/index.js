@@ -1,6 +1,8 @@
 // Example app
 import Deckly from "../../src";
 
+const IMD_DOMAINS = ["IMD18_mean", "Access_mean", "Crime_mean", "Education_mean", "Employment_mean", "Health_mean", "Housing_mean", "Income_mean"]
+
 Deckly({
     title: "Cancer distribution in NZ",
     data: "https://uoa-eresearch.github.io/cancermap/data/TALB_2018.geojson",
@@ -76,6 +78,19 @@ Deckly({
         layout: {
             title: d => `Age distribution in ${d ? d.properties.TALB2018_1 : "NZ"} as per the 2018 census`,
             barmode: 'stack',
+        }
+    },
+    {
+        id: "deprivation",
+        data: data => [
+            {
+                x: IMD_DOMAINS.map(k => k.replace("_mean", "")),
+                y: IMD_DOMAINS.map(k => data.aggregate ? data[k] / 86 : data[k]),
+                type: 'line',
+            }
+        ],
+        layout: {
+            title: d => `Deprivation in ${d ? d.properties.TALB2018_1 : "NZ"}`,
         }
     }]
 })

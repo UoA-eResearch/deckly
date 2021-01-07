@@ -45,9 +45,13 @@ function aggregate(items) {
                         result[k][sk] += v[sk]
                     }
                 }
+            } else if (typeof(v) == "number") {
+                if (!result[k]) result[k] = 0;
+                result[k] += v
             }
         }
     }
+    result["aggregate"] = true
     console.log(result)
     return result;
 }
@@ -156,9 +160,10 @@ class DecklyComponent extends React.Component {
                                         layout={{
                                             title: p.layout.title(this.state.hoverInfo.object),
                                             barmode: 'stack',
+                                            height: 300,
                                         }}
                                         useResizeHandler={true}
-                                        style={p.style}
+                                        style={p.style || { width: "100%" }}
                                     />
                                 })
                             }
