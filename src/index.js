@@ -61,7 +61,9 @@ class DecklyComponent extends React.Component {
             accessor: this.props.colorBy,
             isLoaded: false,
             per: false,
-            hoverInfo: {}
+            hoverInfo: {},
+            limits: this.props.limits,
+            selected: null
         }
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -70,11 +72,10 @@ class DecklyComponent extends React.Component {
         fetch(this.props.data)
             .then(results => results.json())
             .then(json => {
-                console.log(json);
                 if (json.type == "Topology") {
-                    json = feature(json, Object.keys(json.objects)[0])
-                    console.log(json);
+                    json = feature(json, Object.keys(json.objects)[0]) // Convert topojson to geojson
                 }
+                console.log(json);
                 this.setState({
                     isLoaded: true,
                     items: json.features,
@@ -97,19 +98,27 @@ class DecklyComponent extends React.Component {
         if (!this.state.isLoaded) return null;
 
         const data = this.state.items.map(this.state.accessor)
-        const limits = chroma.limits(data, 'e', 2)
-        const COLOR_SCALE = chroma.scale('Blues').domain(limits);
-        console.log(COLOR_SCALE)
+        if (!this.state.limits) {
+            this.state.limits = chroma.limits(data, 'e', 2)
+        }
+        const COLOR_SCALE = chroma.scale('Blues').domain(this.state.limits);
         const layers = [
             new GeoJsonLayer({
                 id: 'geojson',
                 data: this.state.items,
                 opacity: 0.8,
+                lineWidthUnits: "pixels",
                 lineWidthMinPixels: 1,
+                getLineWidth: f => f == this.state.selected ? 3 : 1,
                 getFillColor: f => COLOR_SCALE(this.state.accessor(f)).rgb(),
-                getLineColor: [0, 0, 0],
+                getLineColor: f => f == this.state.selected ? [255,69,0] : [0, 0, 0],
                 pickable: true,
-                onHover: info => this.setState({hoverInfo: info})
+                onHover: info => this.state.selected == null ? this.setState({hoverInfo: info}) : null,
+                onClick: info => this.state.selected == info.object ? this.setState({selected: null}) : this.setState({selected: info.object, hoverInfo: info}),
+                updateTriggers: {
+                    getLineWidth: this.state.selected,
+                    getLineColor: this.state.selected
+                },
             })
         ];
 
@@ -130,7 +139,7 @@ class DecklyComponent extends React.Component {
                                         </div>
                                     )
                                 }
-                                <AbsoluteLegend title={this.props.legendTitle} colorScale={COLOR_SCALE} limits={limits} steps={5}/>
+                                <AbsoluteLegend title={this.props.legendTitle} colorScale={COLOR_SCALE} limits={this.state.limits} steps={5}/>
                             </DeckGL>
                         </ReflexElement>
                         <ReflexSplitter/>

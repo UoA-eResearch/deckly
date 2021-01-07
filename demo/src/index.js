@@ -8,6 +8,7 @@ Deckly({
     hoverMessage: d => d.properties.TALB2018_1,
     perText: "Display cancer/smoking values as per 100K people",
     legendTitle: "Cancer registrations from 2016-2018 divided by 2018 adult population (percentage)",
+    limits: [1,3],
     plots: [{
         id: "cancertypes",
         style: {
