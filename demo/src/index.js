@@ -9,6 +9,23 @@ Deckly({
     colorBy: d => d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
     hoverMessage: d => d.properties.TALB2018_1,
     perText: "Display cancer/smoking values as per 100K people",
+    perFunc: d => {
+        const RATE_PER = 1E5;
+        var f = JSON.parse(JSON.stringify(d))
+        console.log(f);
+        for (var subkey of ["cancer", "smoking"]) {
+            for (var k in f[subkey]) {
+                if (k.includes("total")) {
+                    f[subkey][k] = f[subkey][k] / f.age.Total.Total * RATE_PER
+                } else if (k.includes("non-maori")) {
+                    f[subkey][k] = f[subkey][k] / f.age["Non-maori"].Total * RATE_PER
+                } else {
+                    f[subkey][k] = f[subkey][k] / f.age["Maori"].Total * RATE_PER
+                }
+            }
+        }
+        return f
+    },
     legendTitle: "Cancer registrations from 2016-2018 divided by 2018 adult population (percentage)",
     limits: [1,3],
     plots: [{

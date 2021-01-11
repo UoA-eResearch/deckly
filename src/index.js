@@ -154,9 +154,13 @@ class DecklyComponent extends React.Component {
                             </div>
                             {
                                 this.props.plots.map(p => {
+                                    var data = this.state.hoverInfo.object ? this.state.hoverInfo.object.properties : this.state.aggregate;
+                                    if (this.state.per) {
+                                        data = this.props.perFunc(data)
+                                    }
                                     return <Plot
                                         key={p.id}
-                                        data={p.data(this.state.hoverInfo.object ? this.state.hoverInfo.object.properties : this.state.aggregate)}
+                                        data={p.data(data)}
                                         layout={{
                                             title: p.layout.title(this.state.hoverInfo.object),
                                             barmode: 'stack',
