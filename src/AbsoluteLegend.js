@@ -1,23 +1,41 @@
 import React from 'react';
+import chroma from "chroma-js";
 
 const approxeq = (v1, v2, epsilon = 0.001) => Math.abs(v1 - v2) <= epsilon;
 
 export default class AbsoluteLegend extends React.Component {
     render() {
-        const step = (this.props.limits[1] - this.props.limits[0]) / this.props.steps;
         const items = []
-        for (var i = this.props.limits[0]; i <= this.props.limits[1]; i += step) {
-            var iStr = i.toLocaleString();
-            if (approxeq(i, this.props.limits[0])) {
-                iStr = "<=" + iStr;
-            } else if (approxeq(i, this.props.limits[1])) {
-                iStr = ">=" + iStr;
+        if (typeof(this.props.colorScale) == "function") {
+            const step = (this.props.limits[1] - this.props.limits[0]) / this.props.steps;
+            for (var i = this.props.limits[0]; i <= this.props.limits[1]; i += step) {
+                var iStr = i.toLocaleString();
+                if (approxeq(i, this.props.limits[0])) {
+                    iStr = "<=" + iStr;
+                } else if (approxeq(i, this.props.limits[1])) {
+                    iStr = ">=" + iStr;
+                }
+                items.push(<div key={i}><i style={{
+                    background: this.props.colorScale(i),
+                    width: "18px",
+                    height: "18px"
+                }}></i>{iStr}</div>)
             }
-            items.push(<div key={i}><i style={{
-                background: this.props.colorScale(i),
-                width: "18px",
-                height: "18px"
-            }}></i>{iStr}</div>)
+        } else if (typeof(this.props.colorScale == "object")) {// Bivariate
+            const dx = (this.props.limits[0][1] - this.props.limits[0][0]) / this.props.steps;
+            const dy = (this.props.limits[1][1] - this.props.limits[1][0]) / this.props.steps;
+            for (var ix = 0; ix < this.props.steps; ix++) {
+                for (var iy = 0; iy < this.props.steps; iy++) {
+                    var x = this.props.limits[0][0] + ix * (this.props.limits[0][1] - this.props.limits[0][0]) / this.props.steps;
+                    var y = this.props.limits[1][0] + iy * (this.props.limits[1][1] - this.props.limits[1][0]) / this.props.steps;
+                    items.push(<i style={{
+                        background: chroma.blend(this.props.colorScale[0](x), this.props.colorScale[1](y), "multiply"),
+                        width: "18px",
+                        height: "18px"
+                    }}></i>)
+                }
+                items.push(<br/>)
+            }
         }
 
         return <div key="legend" className="legend" style={{

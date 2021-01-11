@@ -102,10 +102,22 @@ class DecklyComponent extends React.Component {
         if (!this.state.isLoaded) return null;
 
         const data = this.state.items.map(this.state.accessor)
+        console.log(data)
         if (!this.state.limits) {
-            this.state.limits = chroma.limits(data, 'e', 2)
+            if (typeof(data[0]) == "number") {
+                this.state.limits = chroma.limits(data, 'e', 1)
+            } else if (typeof(data[0]) == "object") {
+                this.state.limits = [chroma.limits(data.map(v => v[0]), 'e', 1), chroma.limits(data.map(v => v[1]), 'e', 1)]
+            }
+            console.log(this.state.limits)
         }
-        const COLOR_SCALE = chroma.scale('Blues').domain(this.state.limits);
+        var COLOR_SCALE;
+        if (typeof(this.props.colorScale) == "string") {
+            COLOR_SCALE = chroma.scale(this.props.colorScale).domain(this.state.limits)
+        } else if (typeof(this.props.colorScale) == "object") { // Bivariate
+            COLOR_SCALE = [chroma.scale(this.props.colorScale[0]).domain(this.state.limits[0]), chroma.scale(this.props.colorScale[1]).domain(this.state.limits[1])]
+        }
+        console.log(COLOR_SCALE)
         const layers = [
             new GeoJsonLayer({
                 id: 'geojson',
@@ -114,7 +126,9 @@ class DecklyComponent extends React.Component {
                 lineWidthUnits: "pixels",
                 lineWidthMinPixels: 1,
                 getLineWidth: f => f == this.state.selected ? 3 : 1,
-                getFillColor: f => COLOR_SCALE(this.state.accessor(f)).rgb(),
+                getFillColor: f => typeof(COLOR_SCALE) == "object" ?
+                    chroma.blend(COLOR_SCALE[0](this.state.accessor(f)[0]), COLOR_SCALE[1](this.state.accessor(f)[1]), "multiply").rgb() :
+                    COLOR_SCALE(this.state.accessor(f)).rgb(),
                 getLineColor: f => f == this.state.selected ? [255,69,0] : [0, 0, 0],
                 pickable: true,
                 onHover: info => this.state.selected == null ? this.setState({hoverInfo: info}) : null,
