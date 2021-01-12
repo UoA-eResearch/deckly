@@ -7,6 +7,7 @@ Deckly({
     title: "Cancer distribution in NZ",
     data: "https://uoa-eresearch.github.io/cancermap/data/TALB_2018.geojson",
     //colorBy: d => d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
+    //colorScale: "Blues",
     colorBy: d => [d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
                    d.properties.IMD18_mean],
     colorScale: ["Blues", "Reds"],

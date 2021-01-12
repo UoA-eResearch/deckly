@@ -1,20 +1,52 @@
 <html>
 
 <head>
+    <!-- Use CDN -->
     <script src="https://unpkg.com/deckly/umd/deckly.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/deckly/umd/deckly.css">
+    <!-- or
+    <script src="../umd/deckly.min.js"></script>
+    <link rel="stylesheet" href="../umd/deckly.css">
+    -->
 </head>
 
 <body>
     <div id="root"></div>
     <script>
+        const IMD_DOMAINS = ["IMD18_mean", "Access_mean", "Crime_mean", "Education_mean", "Employment_mean", "Health_mean", "Housing_mean", "Income_mean"]
+
         Deckly({
             title: "Cancer distribution in NZ",
             container: document.querySelector("#root"),
             data: "https://uoa-eresearch.github.io/cancermap/data/TALB_2018.geojson",
-            colorBy: d => d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
+            //colorBy: d => d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
+            //colorScale: "Blues",
+            colorBy: d => [d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
+                d.properties.IMD18_mean
+            ],
+            colorScale: ["Blues", "Reds"],
             hoverMessage: d => d.properties.TALB2018_1,
             perText: "Display cancer/smoking values as per 100K people",
+            perFunc: d => {
+                const RATE_PER = 1E5;
+                var f = JSON.parse(JSON.stringify(d))
+                console.log(f);
+                for (var subkey of["cancer", "smoking"]) {
+                    for (var k in f[subkey]) {
+                        if (k.includes("total")) {
+                            f[subkey][k] = f[subkey][k] / f.age.Total.Total * RATE_PER
+                        } else if (k.includes("non-maori")) {
+                            f[subkey][k] = f[subkey][k] / f.age["Non-maori"].Total * RATE_PER
+                        } else {
+                            f[subkey][k] = f[subkey][k] / f.age["Maori"].Total * RATE_PER
+                        }
+                    }
+                }
+                return f
+            },
+            legendTitle: "Cancer registrations from 2016-2018 divided by 2018 adult population (percentage) vs deprivation",
+            legendLabels: ["Cancer ->", "Deprivation ->"],
+            //limits: [1,3],
             plots: [{
                 id: "cancertypes",
                 style: {
@@ -77,6 +109,16 @@
                 layout: {
                     title: d => `Age distribution in ${d ? d.properties.TALB2018_1 : "NZ"} as per the 2018 census`,
                     barmode: 'stack',
+                }
+            }, {
+                id: "deprivation",
+                data: data => [{
+                    x: IMD_DOMAINS.map(k => k.replace("_mean", "")),
+                    y: IMD_DOMAINS.map(k => data.aggregate ? data[k] / 86 : data[k]),
+                    type: 'line',
+                }],
+                layout: {
+                    title: d => `Deprivation in ${d ? d.properties.TALB2018_1 : "NZ"}`,
                 }
             }]
         })
