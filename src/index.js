@@ -157,7 +157,7 @@ class DecklyComponent extends React.Component {
                                         </div>
                                     )
                                 }
-                                <AbsoluteLegend title={this.props.legendTitle} colorScale={COLOR_SCALE} limits={this.state.limits} steps={5}/>
+                                <AbsoluteLegend title={this.props.legendTitle} colorScale={COLOR_SCALE} limits={this.state.limits} labels={this.props.legendLabels} steps={5}/>
                             </DeckGL>
                         </ReflexElement>
                         <ReflexSplitter/>

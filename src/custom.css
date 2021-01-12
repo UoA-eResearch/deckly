@@ -10,6 +10,10 @@ html,
     overflow: hidden;
 }
 
+.reflex-container > .reflex-element.map {
+    overflow: hidden;
+}
+
 #plots {
     overflow-y: auto;
 }
