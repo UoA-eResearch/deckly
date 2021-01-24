@@ -61,3 +61,7 @@ html,
     margin: 0 0 5px;
     color: white;
 }
+#grid {
+    display: grid;
+    margin-bottom: 15px;
+}

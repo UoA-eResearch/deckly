@@ -5,6 +5,7 @@ const approxeq = (v1, v2, epsilon = 0.001) => Math.abs(v1 - v2) <= epsilon;
 
 export default class AbsoluteLegend extends React.Component {
     render() {
+        const labels = []
         const items = []
         if (typeof(this.props.colorScale) == "function") {
             const step = (this.props.limits[1] - this.props.limits[0]) / this.props.steps;
@@ -24,8 +25,8 @@ export default class AbsoluteLegend extends React.Component {
         } else if (typeof(this.props.colorScale == "object")) {// Bivariate
             const dx = (this.props.limits[0][1] - this.props.limits[0][0]) / this.props.steps;
             const dy = (this.props.limits[1][1] - this.props.limits[1][0]) / this.props.steps;
-            items.push(<div>{this.props.labels[0]}</div>)
-            items.push(<div style={{
+            labels.push(<div>{this.props.labels[0]}</div>)
+            labels.push(<div style={{
                 transform: "rotate(90deg) translate(160px, 30px)"
             }}>{this.props.labels[1]}</div>)
             for (var iy = 0; iy < this.props.steps; iy++) {
@@ -34,11 +35,8 @@ export default class AbsoluteLegend extends React.Component {
                     var y = this.props.limits[1][0] + iy * dy;
                     items.push(<i style={{
                         background: chroma.blend(this.props.colorScale[0](x), this.props.colorScale[1](y), "multiply"),
-                        width: "18px",
-                        height: "18px"
                     }} title={`${x.toLocaleString()},${y.toLocaleString()}`}></i>)
                 }
-                items.push(<br/>)
             }
         }
 
@@ -47,7 +45,10 @@ export default class AbsoluteLegend extends React.Component {
             bottom: this.props.bottom || 30,
         }}>
             <h4>{this.props.title}</h4>
-            {items}<br/>
+            {labels}
+            <div id="grid" style={{
+                "grid-template-columns": `repeat(${this.props.steps}, 18px)`
+            }}>{items}</div>
             Hover over an area to show plots for that area
         </div>
     }
