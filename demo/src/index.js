@@ -3,6 +3,15 @@ import Deckly from "../../src";
 
 const IMD_DOMAINS = ["IMD18_mean", "Access_mean", "Crime_mean", "Education_mean", "Employment_mean", "Health_mean", "Housing_mean", "Income_mean"]
 
+const PCP_COLUMNS = {
+    'Māori 2010-2012': "maori2010-2012",
+    'Non-māori 2010-2012': "non-maori2010-2012",
+    'Māori 2013-2015': "maori2013-2015",
+    'Non-māori 2013-2015': "non-maori2013-2015",
+    'Māori 2016-2018': "maori2016-2018",
+    'Non-māori 2016-2018': "non-maori2016-2018",
+}
+
 Deckly({
     title: "Cancer distribution in NZ",
     data: "https://uoa-eresearch.github.io/cancermap/data/TALB_2018.geojson",
@@ -16,7 +25,7 @@ Deckly({
     perFunc: d => {
         const RATE_PER = 1E5;
         var f = JSON.parse(JSON.stringify(d))
-        console.log(f);
+        //console.log(f);
         for (var subkey of ["cancer", "smoking"]) {
             for (var k in f[subkey]) {
                 if (k.includes("total")) {
@@ -114,5 +123,32 @@ Deckly({
         layout: {
             title: d => `Deprivation in ${d ? d.properties.TALB2018_1 : "NZ"}`,
         }
-    }]
+    },
+    {
+        id: "pcp",
+        type: "PCP",
+        data: (data, hoverInfo) => [
+            {
+                type: 'parcoords',
+                line: {
+                    color: hoverInfo.object ? data.map(f => f == hoverInfo.object ? 1 : 0) : Object.keys(data),
+                    colorscale: 'Jet'
+                },
+                dimensions: Object.entries(PCP_COLUMNS).map(([k, v]) => {
+                    return {
+                        label: k,
+                        values: data.map(d => d.properties.cancer["total 18+ all cancer" + v])
+                    }
+                })
+            }
+        ],
+        style: {
+            height: "500px",
+            width: "100%"
+        },
+        layout: {
+            title: d => `Parallel coordinate plot of cancer distribution in NZ`
+        }
+    }
+]
 })

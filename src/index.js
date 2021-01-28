@@ -183,20 +183,39 @@ class DecklyComponent extends React.Component {
                             {
                                 this.props.plots.map(p => {
                                     var data = this.state.hoverInfo.object ? this.state.hoverInfo.object.properties : this.state.aggregate;
-                                    if (this.state.per) {
-                                        data = this.props.perFunc(data)
+                                    if (p.type == "PCP") {
+                                        data = this.state.items;
+                                        if (this.state.per) {
+                                            console.log("preperfunc", data);
+                                            data = data.map(f => this.props.perFunc(f))
+                                            console.log("perfunc", data)
+                                        }
+                                        return <Plot
+                                            key={p.id}
+                                            data={p.data(data, this.state.hoverInfo)}
+                                            layout={{
+                                                title: p.layout.title(this.state.hoverInfo.object),
+                                                height: 300,
+                                            }}
+                                            useResizeHandler={true}
+                                            style={p.style || { width: "100%" }}
+                                        />
+                                    } else {
+                                        if (this.state.per) {
+                                            data = this.props.perFunc(data)
+                                        }
+                                        return <Plot
+                                            key={p.id}
+                                            data={p.data(data)}
+                                            layout={{
+                                                title: p.layout.title(this.state.hoverInfo.object),
+                                                barmode: 'stack',
+                                                height: 300,
+                                            }}
+                                            useResizeHandler={true}
+                                            style={p.style || { width: "100%" }}
+                                        />
                                     }
-                                    return <Plot
-                                        key={p.id}
-                                        data={p.data(data)}
-                                        layout={{
-                                            title: p.layout.title(this.state.hoverInfo.object),
-                                            barmode: 'stack',
-                                            height: 300,
-                                        }}
-                                        useResizeHandler={true}
-                                        style={p.style || { width: "100%" }}
-                                    />
                                 })
                             }
                         </ReflexElement>
@@ -208,5 +227,6 @@ class DecklyComponent extends React.Component {
 }
 
 export default function Deckly(props) {
-    render(<DecklyComponent {...props} />, document.body);
+    document.body.innerHTML = "<div id='root'></div>"
+    render(<DecklyComponent {...props} />, document.querySelector("#root"));
 }
