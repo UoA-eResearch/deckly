@@ -183,6 +183,11 @@ class DecklyComponent extends React.Component {
                             {
                                 this.props.plots.map(p => {
                                     var data = this.state.hoverInfo.object ? this.state.hoverInfo.object.properties : this.state.aggregate;
+                                    if (!p.style) p.style = {}
+                                    const DEFAULT_STYLE = {
+                                        width: "100%",
+                                        height: "300px"
+                                    }
                                     if (p.type == "PCP") {
                                         data = this.state.items;
                                         if (this.state.per) {
@@ -195,10 +200,9 @@ class DecklyComponent extends React.Component {
                                             data={p.data(data, this.state.hoverInfo)}
                                             layout={{
                                                 title: p.layout.title(this.state.hoverInfo.object),
-                                                height: 300,
                                             }}
                                             useResizeHandler={true}
-                                            style={p.style || { width: "100%" }}
+                                            style={{...DEFAULT_STYLE, ...p.style}}
                                         />
                                     } else {
                                         if (this.state.per) {
@@ -210,10 +214,9 @@ class DecklyComponent extends React.Component {
                                             layout={{
                                                 title: p.layout.title(this.state.hoverInfo.object),
                                                 barmode: 'stack',
-                                                height: 300,
                                             }}
                                             useResizeHandler={true}
-                                            style={p.style || { width: "100%" }}
+                                            style={{...DEFAULT_STYLE, ...p.style}}
                                         />
                                     }
                                 })
