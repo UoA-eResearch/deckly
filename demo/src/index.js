@@ -31,7 +31,7 @@ Deckly({
         return f
     },
     legendTitle: "Cancer registrations from 2016-2018 divided by 2018 adult population (percentage) vs deprivation",
-    legendLabels: ["Cancer ->", "Deprivation ->"],
+    legendLabels: ["Cancer →", "Deprivation →"],
     //limits: [1,3],
     plots: [{
         id: "cancertypes",
