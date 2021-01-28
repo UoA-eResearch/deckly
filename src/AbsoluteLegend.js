@@ -25,15 +25,15 @@ export default class AbsoluteLegend extends React.Component {
         } else if (typeof(this.props.colorScale == "object")) {// Bivariate
             const dx = (this.props.limits[0][1] - this.props.limits[0][0]) / this.props.steps;
             const dy = (this.props.limits[1][1] - this.props.limits[1][0]) / this.props.steps;
-            labels.push(<div>{this.props.labels[0]}</div>)
-            labels.push(<div style={{
+            labels.push(<div key={"label0"}>{this.props.labels[0]}</div>)
+            labels.push(<div key={"label1"} style={{
                 transform: "rotate(90deg) translate(160px, 30px)"
             }}>{this.props.labels[1]}</div>)
             for (var iy = 0; iy < this.props.steps; iy++) {
                 for (var ix = 0; ix < this.props.steps; ix++) {
                     var x = this.props.limits[0][0] + ix * dx;
                     var y = this.props.limits[1][0] + iy * dy;
-                    items.push(<i style={{
+                    items.push(<i key={`${ix}_${iy}`} style={{
                         background: chroma.blend(this.props.colorScale[0](x), this.props.colorScale[1](y), "multiply"),
                     }} title={`${x.toLocaleString()},${y.toLocaleString()}`}></i>)
                 }
@@ -47,7 +47,7 @@ export default class AbsoluteLegend extends React.Component {
             <h4>{this.props.title}</h4>
             {labels}
             <div id="grid" style={{
-                "grid-template-columns": `repeat(${this.props.steps}, 18px)`
+                gridTemplateColumns: `repeat(${this.props.steps}, 18px)`
             }}>{items}</div>
             Hover over an area to show plots for that area
         </div>

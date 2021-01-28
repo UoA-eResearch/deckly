@@ -8,6 +8,8 @@ import { feature } from 'topojson-client';
 import chroma from "chroma-js";
 import Plot from 'react-plotly.js';
 import AbsoluteLegend from './AbsoluteLegend';
+import { WebMercatorViewport } from '@deck.gl/core';
+import bbox from "@turf/bbox";
 import "./custom.css";
 
 import {
@@ -16,15 +18,6 @@ import {
     ReflexElement
 } from 'react-reflex'
 import 'react-reflex/styles.css'
-
-// Viewport settings
-const INITIAL_VIEW_STATE = {
-    longitude: 172.5118422,
-    latitude: -41.235726,
-    zoom: 5,
-    pitch: 0,
-    bearing: 0
-};
 
 function aggregate(items) {
     var result = {}
@@ -40,20 +33,35 @@ function aggregate(items) {
                             if (!result[k][sk][ssk]) result[k][sk][ssk] = 0;
                             result[k][sk][ssk] += v[sk][ssk]
                         }
-                    } else if (typeof(v[sk]) == "number") {
+                    } else if (typeof (v[sk]) == "number") {
                         if (!result[k][sk]) result[k][sk] = 0;
                         result[k][sk] += v[sk]
                     }
                 }
-            } else if (typeof(v) == "number") {
+            } else if (typeof (v) == "number") {
                 if (!result[k]) result[k] = 0;
                 result[k] += v
             }
         }
     }
     result["aggregate"] = true
-    console.log(result)
+    console.log("Aggregate calculated. Result:", result)
     return result;
+}
+
+function getViewStateForBounds(BOUNDS) {
+    const viewport = new WebMercatorViewport({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    });
+    const { longitude, latitude, zoom } = viewport.fitBounds(BOUNDS, {
+        padding: 100
+    });
+    return {
+        longitude,
+        latitude,
+        zoom
+    }
 }
 
 class DecklyComponent extends React.Component {
@@ -67,10 +75,12 @@ class DecklyComponent extends React.Component {
             per: false,
             hoverInfo: {},
             limits: this.props.limits,
-            selected: null
+            selected: null,
+            viewport: {}
         }
         this.handleInputChange = this.handleInputChange.bind(this);
     }
+
     componentDidMount() {
         document.title = this.props.title;
         fetch(this.props.data)
@@ -79,22 +89,28 @@ class DecklyComponent extends React.Component {
                 if (json.type == "Topology") {
                     json = feature(json, Object.keys(json.objects)[0]) // Convert topojson to geojson
                 }
-                console.log(json);
+                var b = bbox(json);
+                console.log("GeoJSON loaded:", json, "Bounds:", b);
+                b = [
+                    [b[0], b[1]],
+                    [b[2], b[3]]
+                ]
                 this.setState({
                     isLoaded: true,
                     items: json.features,
-                    aggregate: aggregate(json.features.map(f => f.properties))
+                    aggregate: aggregate(json.features.map(f => f.properties)),
+                    viewport: getViewStateForBounds(b)
                 })
             });
     }
 
     handleInputChange(event) {
-      const target = event.target;
-      const value = target.type === 'checkbox' ? target.checked : target.value;
-      const name = target.name;
-      this.setState({
-        [name]: value
-      });
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+        this.setState({
+            [name]: value
+        });
     }
 
     render() {
@@ -102,22 +118,20 @@ class DecklyComponent extends React.Component {
         if (!this.state.isLoaded) return null;
 
         const data = this.state.items.map(this.state.accessor)
-        console.log(data)
         if (!this.state.limits) {
-            if (typeof(data[0]) == "number") {
+            if (typeof (data[0]) == "number") {
                 this.state.limits = chroma.limits(data, 'e', 1)
-            } else if (typeof(data[0]) == "object") {
+            } else if (typeof (data[0]) == "object") {
                 this.state.limits = [chroma.limits(data.map(v => v[0]), 'e', 1), chroma.limits(data.map(v => v[1]), 'e', 1)]
             }
-            console.log(this.state.limits)
+            console.log("Colourmap limits:", this.state.limits)
         }
         var COLOR_SCALE;
-        if (typeof(this.props.colorScale) == "string") {
+        if (typeof (this.props.colorScale) == "string") {
             COLOR_SCALE = chroma.scale(this.props.colorScale).domain(this.state.limits)
-        } else if (typeof(this.props.colorScale) == "object") { // Bivariate
+        } else if (typeof (this.props.colorScale) == "object") { // Bivariate
             COLOR_SCALE = [chroma.scale(this.props.colorScale[0]).domain(this.state.limits[0]), chroma.scale(this.props.colorScale[1]).domain(this.state.limits[1])]
         }
-        console.log(COLOR_SCALE)
         const layers = [
             new GeoJsonLayer({
                 id: 'geojson',
@@ -126,13 +140,13 @@ class DecklyComponent extends React.Component {
                 lineWidthUnits: "pixels",
                 lineWidthMinPixels: 1,
                 getLineWidth: f => f == this.state.selected ? 3 : 1,
-                getFillColor: f => typeof(COLOR_SCALE) == "object" ?
+                getFillColor: f => typeof (COLOR_SCALE) == "object" ?
                     chroma.blend(COLOR_SCALE[0](this.state.accessor(f)[0]), COLOR_SCALE[1](this.state.accessor(f)[1]), "multiply").rgb() :
                     COLOR_SCALE(this.state.accessor(f)).rgb(),
-                getLineColor: f => f == this.state.selected ? [255,69,0] : [0, 0, 0],
+                getLineColor: f => f == this.state.selected ? [255, 69, 0] : [0, 0, 0],
                 pickable: true,
-                onHover: info => this.state.selected == null ? this.setState({hoverInfo: info}) : null,
-                onClick: info => this.state.selected == info.object ? this.setState({selected: null}) : this.setState({selected: info.object, hoverInfo: info}),
+                onHover: info => this.state.selected == null ? this.setState({ hoverInfo: info }) : null,
+                onClick: info => this.state.selected == info.object ? this.setState({ selected: null }) : this.setState({ selected: info.object, hoverInfo: info }),
                 updateTriggers: {
                     getLineWidth: this.state.selected,
                     getLineColor: this.state.selected
@@ -148,19 +162,19 @@ class DecklyComponent extends React.Component {
                 <ReflexElement>
                     <ReflexContainer orientation="vertical">
                         <ReflexElement className="map">
-                            <DeckGL initialViewState={INITIAL_VIEW_STATE} controller={true} layers={layers}>
+                            <DeckGL initialViewState={this.state.viewport} controller={true} layers={layers}>
                                 <StaticMap mapStyle={BASEMAP.DARK_MATTER} />
                                 {
                                     this.state.hoverInfo.object && (
-                                        <div className="tooltip" style={{position: 'absolute', zIndex: 1, pointerEvents: 'none', left: this.state.hoverInfo.x, top: this.state.hoverInfo.y}}>
-                                        { this.props.hoverMessage(this.state.hoverInfo.object) + ": " + this.props.colorBy(this.state.hoverInfo.object).toLocaleString() }
+                                        <div className="tooltip" style={{ position: 'absolute', zIndex: 1, pointerEvents: 'none', left: this.state.hoverInfo.x, top: this.state.hoverInfo.y }}>
+                                            { this.props.hoverMessage(this.state.hoverInfo.object) + ": " + this.props.colorBy(this.state.hoverInfo.object).toLocaleString()}
                                         </div>
                                     )
                                 }
-                                <AbsoluteLegend title={this.props.legendTitle} colorScale={COLOR_SCALE} limits={this.state.limits} labels={this.props.legendLabels} steps={5}/>
+                                <AbsoluteLegend title={this.props.legendTitle} colorScale={COLOR_SCALE} limits={this.state.limits} labels={this.props.legendLabels} steps={5} />
                             </DeckGL>
                         </ReflexElement>
-                        <ReflexSplitter/>
+                        <ReflexSplitter />
                         <ReflexElement className="plots">
                             <div id="controls">
                                 <input name="per" type="checkbox" checked={this.state.per} onChange={this.handleInputChange} />
