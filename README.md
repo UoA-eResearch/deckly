@@ -11,6 +11,7 @@ Maps and plots are automatically linked, so that when you hover over the map, th
 Check out the examples:
 
 * [NZ Cancer](https://uoa-eresearch.github.io/deckly/examples/cancer) ([source](https://github.com/UoA-eResearch/deckly/blob/main/examples/cancer.html))
+* [AirBNBs vs Land Value in Christchurch](https://uoa-eresearch.github.io/airbnb/) ([source](https://github.com/UoA-eResearch/airbnb/blob/main/index.html))
 
 ## Installation
 
