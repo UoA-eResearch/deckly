@@ -177,8 +177,12 @@ class DecklyComponent extends React.Component {
                         <ReflexSplitter />
                         <ReflexElement className="plots">
                             <div id="controls">
-                                <input name="per" type="checkbox" checked={this.state.per} onChange={this.handleInputChange} />
-                                <label htmlFor="per">{this.props.perText}</label>
+                                {this.props.perText &&
+                                    <div id="perWrapper">
+                                        <input name="per" type="checkbox" checked={this.state.per} onChange={this.handleInputChange} />
+                                        <label htmlFor="per">{this.props.perText}</label>
+                                    </div>
+                                }
                             </div>
                             {
                                 this.props.plots.map(p => {
