@@ -2,8 +2,8 @@
 
 <head>
     <!-- Use CDN -->
-    <script src="https://unpkg.com/deckly@1.0.7/umd/deckly.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/deckly@1.0.7/umd/deckly.css">
+    <script src="https://unpkg.com/deckly@1.0.8/umd/deckly.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/deckly@1.0.8/umd/deckly.css">
     <!-- or
     <script src="../umd/deckly.min.js"></script>
     <link rel="stylesheet" href="../umd/deckly.css">
@@ -11,13 +11,11 @@
 </head>
 
 <body>
-    <div id="root"></div>
     <script>
         const IMD_DOMAINS = ["IMD18_mean", "Access_mean", "Crime_mean", "Education_mean", "Employment_mean", "Health_mean", "Housing_mean", "Income_mean"]
 
         Deckly({
             title: "Cancer distribution in NZ",
-            container: document.querySelector("#root"),
             data: "https://uoa-eresearch.github.io/cancermap/data/TALB_2018.geojson",
             //colorBy: d => d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
             //colorScale: "Blues",
