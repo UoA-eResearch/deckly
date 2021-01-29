@@ -1,6 +1,6 @@
 {
   "name": "deckly",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "deckly React component",
   "main": "lib/index.js",
   "module": "es/index.js",
