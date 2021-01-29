@@ -19,30 +19,22 @@ import {
 } from 'react-reflex'
 import 'react-reflex/styles.css'
 
-function aggregate(items) {
-    var result = {}
-    for (var item of items) {
-        for (var k in item) {
-            var v = item[k]
-            if (typeof (v) == "object") {
-                if (!result[k]) result[k] = {}
-                for (var sk in v) {
-                    if (typeof (v[sk]) == "object") {
-                        for (var ssk in v[sk]) {
-                            if (!result[k][sk]) result[k][sk] = {};
-                            if (!result[k][sk][ssk]) result[k][sk][ssk] = 0;
-                            result[k][sk][ssk] += v[sk][ssk]
-                        }
-                    } else if (typeof (v[sk]) == "number") {
-                        if (!result[k][sk]) result[k][sk] = 0;
-                        result[k][sk] += v[sk]
-                    }
-                }
-            } else if (typeof (v) == "number") {
-                if (!result[k]) result[k] = 0;
-                result[k] += v
-            }
+function addObjects(a, b) {
+    for (var k in b) {
+        if (typeof(b[k]) == "number") {
+            if (!a[k]) a[k] = 0;
+            a[k] += b[k];
+        } else if (typeof(b[k]) == "object") {
+            a[k] = addObjects(a[k], b[k])
         }
+    }
+    return a;
+}
+
+function aggregate(items) {
+    var result = JSON.parse(JSON.stringify(items[0]))
+    for (var i = 1; i < items.length; i++) {
+        result = addObjects(result, items[i])
     }
     result["aggregate"] = true
     console.log("Aggregate calculated. Result:", result)
