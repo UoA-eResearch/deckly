@@ -25,6 +25,7 @@ function addObjects(a, b) {
             if (!a[k]) a[k] = 0;
             a[k] += b[k];
         } else if (typeof(b[k]) == "object") {
+            if (!a[k]) a[k] = {}
             a[k] = addObjects(a[k], b[k])
         }
     }
@@ -32,9 +33,9 @@ function addObjects(a, b) {
 }
 
 function aggregate(items) {
-    var result = JSON.parse(JSON.stringify(items[0]))
-    for (var i = 1; i < items.length; i++) {
-        result = addObjects(result, items[i])
+    var result = {}
+    for (var item of items) {
+        result = addObjects(result, item)
     }
     result["aggregate"] = true
     console.log("Aggregate calculated. Result:", result)
