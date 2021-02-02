@@ -132,7 +132,7 @@ Deckly({
                 type: 'parcoords',
                 line: {
                     color: hoverInfo.object ? data.map(f => f == hoverInfo.object ? 1 : 0) : Object.keys(data),
-                    colorscale: 'Jet'
+                    colorscale: hoverInfo.object ? ["blue", "gray"] : 'Jet'
                 },
                 dimensions: Object.entries(PCP_COLUMNS).map(([k, v]) => {
                     return {
