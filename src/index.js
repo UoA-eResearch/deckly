@@ -192,30 +192,24 @@ class DecklyComponent extends React.Component {
                                             data = data.map(f => this.props.perFunc(f))
                                             console.log("perfunc", data)
                                         }
-                                        return <Plot
-                                            key={p.id}
-                                            data={p.data(data, this.state.hoverInfo)}
-                                            layout={{
-                                                title: p.layout.title(this.state.hoverInfo.object),
-                                            }}
-                                            useResizeHandler={true}
-                                            style={{...DEFAULT_STYLE, ...p.style}}
-                                        />
+                                        data = p.data(data, this.state.hoverInfo)
                                     } else {
                                         if (this.state.per) {
                                             data = this.props.perFunc(data)
                                         }
-                                        return <Plot
-                                            key={p.id}
-                                            data={p.data(data)}
-                                            layout={{
-                                                title: p.layout.title(this.state.hoverInfo.object),
-                                                barmode: 'stack',
-                                            }}
-                                            useResizeHandler={true}
-                                            style={{...DEFAULT_STYLE, ...p.style}}
-                                        />
+                                        data = p.data(data);
                                     }
+                                    return <Plot
+                                        key={p.id}
+                                        data={data}
+                                        layout={{
+                                            title: p.layout.title(this.state.hoverInfo.object),
+                                            barmode: 'stack',
+                                        }}
+                                        useResizeHandler={true}
+                                        style={{...DEFAULT_STYLE, ...p.style}}
+                                        onHover={d => this.setState({"plotly_hover": d})}
+                                    />
                                 })
                             }
                         </ReflexElement>
