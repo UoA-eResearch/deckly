@@ -23,7 +23,7 @@
     "@turf/bbox": "^6.3.0",
     "chroma-js": "^2.1.0",
     "deck.gl": "^8.3.11",
-    "plotly.js": "^1.58.3",
+    "plotly.js": "^1.58.4",
     "react-map-gl": "^5.2.11",
     "react-plotly.js": "^2.5.1",
     "react-reflex": "^3.1.0",

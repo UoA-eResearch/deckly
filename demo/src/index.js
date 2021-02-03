@@ -3,14 +3,7 @@ import Deckly from "../../src";
 
 const IMD_DOMAINS = ["IMD18_mean", "Access_mean", "Crime_mean", "Education_mean", "Employment_mean", "Health_mean", "Housing_mean", "Income_mean"]
 
-const PCP_COLUMNS = {
-    'Māori 2010-2012': "maori2010-2012",
-    'Non-māori 2010-2012': "non-maori2010-2012",
-    'Māori 2013-2015': "maori2013-2015",
-    'Non-māori 2013-2015': "non-maori2013-2015",
-    'Māori 2016-2018': "maori2016-2018",
-    'Non-māori 2016-2018': "non-maori2016-2018",
-}
+const YEAR_BRACKETS = ["2010-2012", "2013-2015", "2016-2018"]
 
 Deckly({
     title: "Cancer distribution in NZ",
@@ -50,12 +43,14 @@ Deckly({
         data: ({cancer}) => [ 
             {
                 name: "Māori",
+                vars: ["breastmaori2016-2018", "prostatemaori2016-2018", "lungmaori2016-2018"],
                 x: ["Breast cancer", "Prostate cancer", "Lung cancer"],
                 y: [cancer["breastmaori2016-2018"], cancer["prostatemaori2016-2018"], cancer["lungmaori2016-2018"]],
                 type: 'bar',
             },
             {
                 name: "Non-māori",
+                vars: ["breastnon-maori2016-2018", "prostatenon-maori2016-2018", "lungnon-maori2016-2018"],
                 x: ["Breast cancer", "Prostate cancer", "Lung cancer"],
                 y: [cancer["breastnon-maori2016-2018"], cancer["prostatenon-maori2016-2018"], cancer["lungnon-maori2016-2018"]],
                 type: 'bar',
@@ -125,29 +120,24 @@ Deckly({
         }
     },
     {
-        id: "pcp",
-        type: "PCP",
-        data: (data, hoverInfo) => [
+        id: "cancer_over_time",
+        data: ({cancer}) => [
             {
-                type: 'parcoords',
-                line: {
-                    color: hoverInfo.object ? data.map(f => f == hoverInfo.object ? 1 : 0) : Object.keys(data),
-                    colorscale: hoverInfo.object ? ["blue", "gray"] : 'Jet'
-                },
-                dimensions: Object.entries(PCP_COLUMNS).map(([k, v]) => {
-                    return {
-                        label: k,
-                        values: data.map(d => d.properties.cancer["total 18+ all cancer" + v])
-                    }
-                })
+                name: "Māori",
+                type: 'bar',
+                x: YEAR_BRACKETS,
+                y: YEAR_BRACKETS.map(y => cancer["total 18+ all cancermaori" + y]),
+            },
+            {
+                name: "Non-māori",
+                type: 'bar',
+                x: YEAR_BRACKETS,
+                y: YEAR_BRACKETS.map(y => cancer["total 18+ all cancernon-maori" + y]),
             }
         ],
-        style: {
-            height: "500px",
-            width: "100%"
-        },
         layout: {
-            title: d => `Parallel coordinate plot of cancer distribution in NZ`
+            title: d => `Cancer over time in ${d ? d.properties.TALB2018_1 : "NZ"}`,
+            barmode: 'stack'
         }
     }
 ]

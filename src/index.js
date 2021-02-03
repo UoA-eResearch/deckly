@@ -6,11 +6,19 @@ import { StaticMap } from 'react-map-gl';
 import { BASEMAP } from '@deck.gl/carto';
 import { feature } from 'topojson-client';
 import chroma from "chroma-js";
-import Plot from 'react-plotly.js';
 import AbsoluteLegend from './AbsoluteLegend';
 import { WebMercatorViewport } from '@deck.gl/core';
 import bbox from "@turf/bbox";
 import "./custom.css";
+
+import Plot from 'react-plotly.js'
+
+// Custom react-plotly
+/*
+import Plotly from '@uoa-eresearch/plotly.js/dist/plotly'
+import createPlotlyComponent from 'react-plotly.js/factory';
+const Plot = createPlotlyComponent(Plotly);
+*/
 
 import {
     ReflexContainer,
