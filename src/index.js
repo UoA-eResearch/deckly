@@ -69,9 +69,15 @@ class DecklyComponent extends React.Component {
 
     constructor(props) {
         super(props);
+        var accessor = this.props.colorBy;
+        if (typeof(accessor) == "object") {
+            var accessorName = Object.keys(accessor)[0];
+            accessor = accessor[accessorName]
+        }
         this.state = {
             items: [],
-            accessor: this.props.colorBy,
+            accessor: accessor,
+            accessorName: accessorName,
             isLoaded: false,
             per: false,
             hoverInfo: {},
@@ -80,6 +86,14 @@ class DecklyComponent extends React.Component {
             viewport: {}
         }
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.changeAccessor = this.changeAccessor.bind(this);
+    }
+
+    changeAccessor(accessorName) {
+        this.setState({
+            accessorName: accessorName,
+            accessor: this.props.colorBy[accessorName]
+        })
     }
 
     componentDidMount() {
@@ -127,11 +141,15 @@ class DecklyComponent extends React.Component {
             }
             console.log("Colourmap limits:", this.state.limits)
         }
-        var COLOR_SCALE;
-        if (typeof (this.props.colorScale) == "string") {
-            COLOR_SCALE = chroma.scale(this.props.colorScale).domain(this.state.limits)
-        } else if (typeof (this.props.colorScale) == "object") { // Bivariate
-            COLOR_SCALE = [chroma.scale(this.props.colorScale[0]).domain(this.state.limits[0]), chroma.scale(this.props.colorScale[1]).domain(this.state.limits[1])]
+        var colorScale = this.props.colorScale;
+        console.log("Render()", this.state)
+        if (typeof (colorScale) == "string" || typeof(data[0]) == "number") {
+            if (typeof(colorScale) == "object") {
+                colorScale = colorScale[0]
+            }
+            colorScale = chroma.scale(colorScale).domain(this.state.limits)
+        } else if (typeof (colorScale) == "object") { // Bivariate
+            colorScale = [chroma.scale(colorScale[0]).domain(this.state.limits[0]), chroma.scale(colorScale[1]).domain(this.state.limits[1])]
         }
         const layers = [
             new GeoJsonLayer({
@@ -141,9 +159,9 @@ class DecklyComponent extends React.Component {
                 lineWidthUnits: "pixels",
                 lineWidthMinPixels: 1,
                 getLineWidth: f => f == this.state.selected ? 3 : 1,
-                getFillColor: f => typeof (COLOR_SCALE) == "object" ?
-                    chroma.blend(COLOR_SCALE[0](this.state.accessor(f)[0]), COLOR_SCALE[1](this.state.accessor(f)[1]), "multiply").rgb() :
-                    COLOR_SCALE(this.state.accessor(f)).rgb(),
+                getFillColor: f => typeof (colorScale) == "object" ?
+                    chroma.blend(colorScale[0](this.state.accessor(f)[0]), colorScale[1](this.state.accessor(f)[1]), "multiply").rgb() :
+                    colorScale(this.state.accessor(f)).rgb(),
                 getLineColor: f => f == this.state.selected ? [255, 69, 0] : [0, 0, 0],
                 pickable: true,
                 onHover: info => this.state.selected == null ? this.setState({ hoverInfo: info }) : null,
@@ -168,11 +186,11 @@ class DecklyComponent extends React.Component {
                                 {
                                     this.state.hoverInfo.object && (
                                         <div className="tooltip" style={{ position: 'absolute', zIndex: 1, pointerEvents: 'none', left: this.state.hoverInfo.x, top: this.state.hoverInfo.y }}>
-                                            { this.props.hoverMessage(this.state.hoverInfo.object) + ": " + this.props.colorBy(this.state.hoverInfo.object).toLocaleString()}
+                                            { this.props.hoverMessage(this.state.hoverInfo.object) + ": " + this.state.accessor(this.state.hoverInfo.object).toLocaleString()}
                                         </div>
                                     )
                                 }
-                                <AbsoluteLegend title={this.props.legendTitle} colorScale={COLOR_SCALE} limits={this.state.limits} labels={this.props.legendLabels} steps={5} />
+                                <AbsoluteLegend title={this.props.legendTitle} colorScale={colorScale} colorBy={this.props.colorBy} accessorName={this.state.accessorName} changeAccessor={this.changeAccessor} limits={this.state.limits} labels={this.props.legendLabels} steps={5} />
                             </DeckGL>
                         </ReflexElement>
                         <ReflexSplitter />

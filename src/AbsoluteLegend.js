@@ -6,7 +6,7 @@ const approxeq = (v1, v2, epsilon = 0.001) => Math.abs(v1 - v2) <= epsilon;
 export default class AbsoluteLegend extends React.Component {
     render() {
         const labels = []
-        const items = []
+        var items = []
         if (typeof(this.props.colorScale) == "function") {
             const step = (this.props.limits[1] - this.props.limits[0]) / this.props.steps;
             for (var i = this.props.limits[0]; i <= this.props.limits[1]; i += step) {
@@ -19,7 +19,8 @@ export default class AbsoluteLegend extends React.Component {
                 items.push(<div key={i}><i style={{
                     background: this.props.colorScale(i),
                     width: "18px",
-                    height: "18px"
+                    height: "18px",
+                    marginRight: "5px"
                 }}></i>{iStr}</div>)
             }
         } else if (typeof(this.props.colorScale == "object")) {// Bivariate
@@ -38,6 +39,18 @@ export default class AbsoluteLegend extends React.Component {
                     }} title={`${x.toLocaleString()},${y.toLocaleString()}`}></i>)
                 }
             }
+            items = <div id="grid" style={{
+                gridTemplateColumns: `repeat(${this.props.steps}, 18px)`
+            }}>{items}</div>
+        }
+
+        var select = ""
+        if (typeof(this.props.colorBy) == "object") {
+            const options = []
+            for (var k in this.props.colorBy) {
+                options.push(<option key={k}>{k}</option>)
+            }
+            select = <div>Colour by: <select value={this.props.accessorName} onChange={e => this.props.changeAccessor(e.target.value)}>{options}</select></div>
         }
 
         return <div key="legend" className="legend" style={{
@@ -46,10 +59,9 @@ export default class AbsoluteLegend extends React.Component {
         }}>
             <h4>{this.props.title}</h4>
             {labels}
-            <div id="grid" style={{
-                gridTemplateColumns: `repeat(${this.props.steps}, 18px)`
-            }}>{items}</div>
+            {items}
             Hover over an area to show plots for that area
+            {select}
         </div>
     }
 }

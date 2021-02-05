@@ -10,8 +10,13 @@ Deckly({
     data: "https://uoa-eresearch.github.io/cancermap/data/TALB_2018.geojson",
     //colorBy: d => d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
     //colorScale: "Blues",
-    colorBy: d => [d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
-                   d.properties.IMD18_mean],
+    colorBy: {
+        "Bivariate Cancer 2016-2018 + IMD18": d => [
+            d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
+            d.properties.IMD18_mean
+        ],
+        "Cancer 2016-2018": d => d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100
+    },
     colorScale: ["Blues", "Reds"],
     hoverMessage: d => d.properties.TALB2018_1,
     perText: "Display cancer/smoking values as per 100K people",
