@@ -133,7 +133,7 @@ class DecklyComponent extends React.Component {
         if (!this.state.isLoaded) return null;
 
         const data = this.state.items.map(this.state.accessor)
-        if (!this.state.limits) {
+        if (!this.props.limits) { // Unless the user manually passed in limits, calculate them
             if (typeof (data[0]) == "number") {
                 this.state.limits = chroma.limits(data, 'e', 1)
             } else if (typeof (data[0]) == "object") {
@@ -168,7 +168,8 @@ class DecklyComponent extends React.Component {
                 onClick: info => this.state.selected == info.object ? this.setState({ selected: null }) : this.setState({ selected: info.object, hoverInfo: info }),
                 updateTriggers: {
                     getLineWidth: this.state.selected,
-                    getLineColor: this.state.selected
+                    getLineColor: this.state.selected,
+                    getFillColor: this.state.accessor
                 },
             })
         ];
