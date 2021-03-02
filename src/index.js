@@ -74,10 +74,16 @@ class DecklyComponent extends React.Component {
             var accessorName = Object.keys(accessor)[0];
             accessor = accessor[accessorName]
         }
+        var legendTitle = this.props.legendTitle;
+        if (typeof(legendTitle) == "object") {
+            var accessorName = Object.keys(legendTitle)[0];
+            legendTitle = legendTitle[accessorName]
+        }
         this.state = {
             items: [],
             accessor: accessor,
             accessorName: accessorName,
+            legendTitle: legendTitle,
             isLoaded: false,
             per: false,
             hoverInfo: {},
@@ -92,7 +98,8 @@ class DecklyComponent extends React.Component {
     changeAccessor(accessorName) {
         this.setState({
             accessorName: accessorName,
-            accessor: this.props.colorBy[accessorName]
+            accessor: this.props.colorBy[accessorName],
+            legendTitle: this.props.legendTitle[accessorName]
         })
     }
 
@@ -191,7 +198,7 @@ class DecklyComponent extends React.Component {
                                         </div>
                                     )
                                 }
-                                <AbsoluteLegend title={this.props.legendTitle} colorScale={colorScale} colorBy={this.props.colorBy} accessorName={this.state.accessorName} changeAccessor={this.changeAccessor} limits={this.state.limits} labels={this.props.legendLabels} steps={5} />
+                                <AbsoluteLegend title={this.state.legendTitle} colorScale={colorScale} colorBy={this.props.colorBy} accessorName={this.state.accessorName} changeAccessor={this.changeAccessor} limits={this.state.limits} labels={this.props.legendLabels} steps={5} />
                             </DeckGL>
                         </ReflexElement>
                         <ReflexSplitter />
