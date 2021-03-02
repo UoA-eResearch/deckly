@@ -15,7 +15,9 @@ Deckly({
             d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
             d.properties.IMD18_mean
         ],
-        "Cancer 2016-2018": d => d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100
+        "Cancer 2010-2012": d => d.properties.cancer["total 18+ all cancertotal2010-2012"] / d.properties.smoking["total_15+"] * 100,
+        "Cancer 2013-2015": d => d.properties.cancer["total 18+ all cancertotal2013-2015"] / d.properties.smoking["total_15+"] * 100,
+        "Cancer 2016-2018": d => d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
     },
     colorScale: ["Blues", "Reds"],
     hoverMessage: d => d.properties.TALB2018_1,
@@ -39,7 +41,9 @@ Deckly({
     },
     legendTitle: {
         "Bivariate Cancer 2016-2018 + IMD18": "Cancer registrations from 2016-2018 divided by 2018 adult population (percentage) vs deprivation",
-        "Cancer 2016-2018": "Cancer registrations from 2016-2018 divided by 2018 adult population (percentage)"
+        "Cancer 2010-2012": "Cancer registrations from 2013-2015 divided by 2018 adult population (percentage)",
+        "Cancer 2013-2015": "Cancer registrations from 2013-2015 divided by 2018 adult population (percentage)",
+        "Cancer 2016-2018": "Cancer registrations from 2016-2018 divided by 2018 adult population (percentage)",
     },
     legendLabels: ["Cancer →", "Deprivation →"],
     //limits: [1,3],
