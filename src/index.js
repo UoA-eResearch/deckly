@@ -214,6 +214,8 @@ class DecklyComponent extends React.Component {
                             {
                                 this.props.plots.map(p => {
                                     var data = this.state.hoverInfo.object ? this.state.hoverInfo.object.properties : this.state.aggregate;
+                                    data.aggregateData = this.state.aggregate;
+                                    data.hoverObject = this.state.hoverInfo.object;
                                     if (!p.style) p.style = {}
                                     const DEFAULT_STYLE = {
                                         width: "100%",

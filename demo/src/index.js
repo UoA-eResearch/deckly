@@ -120,15 +120,27 @@ Deckly({
     },
     {
         id: "deprivation",
-        data: data => [
-            {
+        data: data => {
+             // NZ wide context
+            var traces = [{
                 x: IMD_DOMAINS.map(k => k.replace("_mean", "")),
-                y: IMD_DOMAINS.map(k => data.aggregate ? data[k] / 86 : data[k]),
+                y: IMD_DOMAINS.map(k => data.aggregateData[k] / 86),
                 type: 'line',
+                name: "NZ"
+            }];
+            if (!data.aggregate) {
+                // This TALB
+                traces.push({
+                    x: IMD_DOMAINS.map(k => k.replace("_mean", "")),
+                    y: IMD_DOMAINS.map(k => data.aggregate ? data[k] / 86 : data[k]),
+                    type: 'line',
+                    name: data.hoverObject ? data.hoverObject.properties.TALB2018_1 : ""
+                })
             }
-        ],
+            return traces
+        },
         layout: {
-            title: d => `Deprivation in ${d ? d.properties.TALB2018_1 : "NZ"}`,
+            title: d => `Deprivation in ${d ? d.properties.TALB2018_1 + " vs NZ" : "NZ"}`,
         }
     },
     {
