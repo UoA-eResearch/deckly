@@ -1,7 +1,7 @@
 // Example app
 import Deckly from "../../src";
 
-const IMD_DOMAINS = ["IMD18_mean", "Access_mean", "Crime_mean", "Education_mean", "Employment_mean", "Health_mean", "Housing_mean", "Income_mean"]
+const IMD_DOMAINS = ["IMD18_mean", "Employment_mean", "Income_mean", "Crime_mean", "Housing_mean", "Health_mean", "Education_mean", "Access_mean"]
 
 const YEAR_BRACKETS = ["2010-2012", "2013-2015", "2016-2018"]
 
