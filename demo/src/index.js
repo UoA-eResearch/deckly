@@ -141,6 +141,9 @@ Deckly({
         },
         layout: {
             title: d => `Deprivation in ${d ? d.properties.TALB2018_1 + " vs NZ" : "NZ"}`,
+            yaxis: {
+                range: [0, 6000]
+            }
         }
     },
     {

@@ -239,6 +239,7 @@ class DecklyComponent extends React.Component {
                                         key={p.id}
                                         data={data}
                                         layout={{
+                                            ...p.layout,
                                             title: p.layout.title(this.state.hoverInfo.object),
                                             barmode: 'stack',
                                         }}
