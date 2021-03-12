@@ -186,7 +186,7 @@ class DecklyComponent extends React.Component {
                 lineWidthMinPixels: 1,
                 // stroked: false,
                 // filled: true,
-                extruded: true,
+                extruded: this.state.height,
                 wireframe: true,
                 getElevation: this.state.height && typeof (colorScale) == "object" ?
                     f => (this.state.accessor(f)[1] - this.state.limits[1][0]) / this.state.limits[1][0] * 20000 : null,
