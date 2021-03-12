@@ -87,6 +87,7 @@ class DecklyComponent extends React.Component {
             isLoaded: false,
             per: false,
             height: true,
+            animating: false,
             hoverInfo: {},
             limits: this.props.limits,
             selected: null,
@@ -95,6 +96,7 @@ class DecklyComponent extends React.Component {
         this.handleInputChange = this.handleInputChange.bind(this);
         this.changeAccessor = this.changeAccessor.bind(this);
         this.toggleHeight = this.toggleHeight.bind(this);
+        this.setAnimating = this.setAnimating.bind(this);
     }
 
     changeAccessor(accessorName) {
@@ -107,7 +109,14 @@ class DecklyComponent extends React.Component {
 
     toggleHeight() {
         this.setState({
-            height: !this.state.height
+            height: !this.state.height,
+            animating: true
+        })
+    }
+
+    setAnimating(animating) {
+        this.setState({
+            animating: animating
         })
     }
 
@@ -181,12 +190,12 @@ class DecklyComponent extends React.Component {
             new GeoJsonLayer({
                 id: 'geojson',
                 data: this.state.items,
-                opacity: this.state.height && typeof (colorScale) == "object" ? 0.95 : 0.8,
+                opacity: 0.8,
                 lineWidthUnits: "pixels",
                 lineWidthMinPixels: 1,
                 // stroked: false,
                 // filled: true,
-                extruded: this.state.height,
+                extruded: this.state.height || this.state.animating,
                 wireframe: true,
                 getElevation: this.state.height && typeof (colorScale) == "object" ?
                     f => (this.state.accessor(f)[1] - this.state.limits[1][0]) / this.state.limits[1][0] * 20000 : null,
@@ -199,7 +208,10 @@ class DecklyComponent extends React.Component {
                 onHover: info => this.state.selected == null ? this.setState({ hoverInfo: info }) : null,
                 onClick: info => this.state.selected == info.object ? this.setState({ selected: null }) : this.setState({ selected: info.object, hoverInfo: info }),
                 transitions: {
-                    getElevation: 400,
+                    getElevation: {
+                        duration: 400,
+                        onEnd: () => this.setAnimating(false) 
+                    },
                     getFillColor: 400
                 },
                 updateTriggers: {
