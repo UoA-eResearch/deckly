@@ -29,10 +29,10 @@ import 'react-reflex/styles.css'
 
 function addObjects(a, b) {
     for (var k in b) {
-        if (typeof(b[k]) == "number") {
+        if (typeof (b[k]) == "number") {
             if (!a[k]) a[k] = 0;
             a[k] += b[k];
-        } else if (typeof(b[k]) == "object") {
+        } else if (typeof (b[k]) == "object") {
             if (!a[k]) a[k] = {}
             a[k] = addObjects(a[k], b[k])
         }
@@ -70,12 +70,12 @@ class DecklyComponent extends React.Component {
     constructor(props) {
         super(props);
         var accessor = this.props.colorBy;
-        if (typeof(accessor) == "object") {
+        if (typeof (accessor) == "object") {
             var accessorName = Object.keys(accessor)[0];
             accessor = accessor[accessorName]
         }
         var legendTitle = this.props.legendTitle;
-        if (typeof(legendTitle) == "object") {
+        if (typeof (legendTitle) == "object") {
             var accessorName = Object.keys(legendTitle)[0];
             legendTitle = legendTitle[accessorName]
         }
@@ -86,6 +86,7 @@ class DecklyComponent extends React.Component {
             legendTitle: legendTitle,
             isLoaded: false,
             per: false,
+            height: true,
             hoverInfo: {},
             limits: this.props.limits,
             selected: null,
@@ -93,6 +94,7 @@ class DecklyComponent extends React.Component {
         }
         this.handleInputChange = this.handleInputChange.bind(this);
         this.changeAccessor = this.changeAccessor.bind(this);
+        this.toggleHeight = this.toggleHeight.bind(this);
     }
 
     changeAccessor(accessorName) {
@@ -100,6 +102,12 @@ class DecklyComponent extends React.Component {
             accessorName: accessorName,
             accessor: this.props.colorBy[accessorName],
             legendTitle: this.props.legendTitle[accessorName]
+        })
+    }
+
+    toggleHeight() {
+        this.setState({
+            height: !this.state.height
         })
     }
 
@@ -150,33 +158,55 @@ class DecklyComponent extends React.Component {
         }
         var colorScale = this.props.colorScale;
         console.log("Render()", this.state)
-        if (typeof (colorScale) == "string" || typeof(data[0]) == "number") {
-            if (typeof(colorScale) == "object") {
+        if (typeof (colorScale) == "string" || typeof (data[0]) == "number") {
+            if (typeof (colorScale) == "object") {
                 colorScale = colorScale[0]
             }
             colorScale = chroma.scale(colorScale).domain(this.state.limits)
         } else if (typeof (colorScale) == "object") { // Bivariate
             colorScale = [chroma.scale(colorScale[0]).domain(this.state.limits[0]), chroma.scale(colorScale[1]).domain(this.state.limits[1])]
         }
+
+        function getE(colorScale) {
+            if (typeof (colorScale) == "object") {
+                console.log(colorScale[1](this.state.accessor(f)[1]) * 10000)
+                return colorScale[1](this.state.accessor(f)[1]) * 10000
+            } else {
+                console.log()
+                return this.state.accessor(f) * 10000
+            }
+        }
+
         const layers = [
             new GeoJsonLayer({
                 id: 'geojson',
                 data: this.state.items,
-                opacity: 0.8,
+                opacity: this.state.height && typeof (colorScale) == "object" ? 0.95 : 0.8,
                 lineWidthUnits: "pixels",
                 lineWidthMinPixels: 1,
+                // stroked: false,
+                // filled: true,
+                extruded: true,
+                wireframe: true,
+                getElevation: this.state.height && typeof (colorScale) == "object" ?
+                    f => (this.state.accessor(f)[1] - this.state.limits[1][0]) / this.state.limits[1][0] * 20000 : null,
                 getLineWidth: f => f == this.state.selected ? 3 : 1,
                 getFillColor: f => typeof (colorScale) == "object" ?
-                    chroma.blend(colorScale[0](this.state.accessor(f)[0]), colorScale[1](this.state.accessor(f)[1]), "multiply").rgb() :
+                    this.state.height ? colorScale[0](this.state.accessor(f)[0]).rgb() : chroma.blend(colorScale[0](this.state.accessor(f)[0]), colorScale[1](this.state.accessor(f)[1]), "multiply").rgb() :
                     colorScale(this.state.accessor(f)).rgb(),
                 getLineColor: f => f == this.state.selected ? [255, 69, 0] : [0, 0, 0],
                 pickable: true,
                 onHover: info => this.state.selected == null ? this.setState({ hoverInfo: info }) : null,
                 onClick: info => this.state.selected == info.object ? this.setState({ selected: null }) : this.setState({ selected: info.object, hoverInfo: info }),
+                transitions: {
+                    getElevation: 400,
+                    getFillColor: 400
+                },
                 updateTriggers: {
                     getLineWidth: this.state.selected,
                     getLineColor: this.state.selected,
-                    getFillColor: this.state.accessor
+                    getElevation: [this.state.height, this.state.accessor],
+                    getFillColor: [this.state.accessor, this.state.height]
                 },
             })
         ];
@@ -189,8 +219,9 @@ class DecklyComponent extends React.Component {
                 <ReflexElement>
                     <ReflexContainer orientation="vertical">
                         <ReflexElement className="map">
+
                             <DeckGL initialViewState={this.state.viewport} controller={true} layers={layers}>
-                                <StaticMap mapStyle={BASEMAP.DARK_MATTER} />
+                                <StaticMap mapStyle={BASEMAP.POSITRON} />
                                 {
                                     this.state.hoverInfo.object && (
                                         <div className="tooltip" style={{ position: 'absolute', zIndex: 1, pointerEvents: 'none', left: this.state.hoverInfo.x, top: this.state.hoverInfo.y }}>
@@ -198,7 +229,7 @@ class DecklyComponent extends React.Component {
                                         </div>
                                     )
                                 }
-                                <AbsoluteLegend title={this.state.legendTitle} colorScale={colorScale} colorBy={this.props.colorBy} accessorName={this.state.accessorName} changeAccessor={this.changeAccessor} limits={this.state.limits} labels={this.props.legendLabels} steps={5} />
+                                <AbsoluteLegend title={this.state.legendTitle} colorScale={colorScale} colorBy={this.props.colorBy} height={this.state.height} toggleHeight={this.toggleHeight} accessorName={this.state.accessorName} changeAccessor={this.changeAccessor} limits={this.state.limits} labels={this.props.legendLabels} steps={5} />
                             </DeckGL>
                         </ReflexElement>
                         <ReflexSplitter />
@@ -241,8 +272,8 @@ class DecklyComponent extends React.Component {
                                             barmode: 'stack',
                                         }}
                                         useResizeHandler={true}
-                                        style={{...DEFAULT_STYLE, ...p.style}}
-                                        onHover={d => this.setState({"plotly_hover": d})}
+                                        style={{ ...DEFAULT_STYLE, ...p.style }}
+                                        onHover={d => this.setState({ "plotly_hover": d })}
                                     />
                                 })
                             }

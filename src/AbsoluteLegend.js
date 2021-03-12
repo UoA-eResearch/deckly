@@ -7,7 +7,7 @@ export default class AbsoluteLegend extends React.Component {
     render() {
         const labels = []
         var items = []
-        if (typeof(this.props.colorScale) == "function") {
+        if (typeof (this.props.colorScale) == "function") {
             const step = (this.props.limits[1] - this.props.limits[0]) / this.props.steps;
             for (var i = this.props.limits[0]; i <= this.props.limits[1]; i += step) {
                 var iStr = i.toLocaleString();
@@ -23,7 +23,23 @@ export default class AbsoluteLegend extends React.Component {
                     marginRight: "5px"
                 }}></i>{iStr}</div>)
             }
-        } else if (typeof(this.props.colorScale == "object")) {// Bivariate
+        } else if (typeof (this.props.colorScale == "object") && this.props.height) {
+            const step = (this.props.limits[0][1] - this.props.limits[0][0]) / this.props.steps;
+            for (var i = this.props.limits[0][0]; i <= this.props.limits[0][1]; i += step) {
+                var iStr = i.toLocaleString();
+                if (approxeq(i, this.props.limits[0][0])) {
+                    iStr = "<=" + iStr;
+                } else if (approxeq(i, this.props.limits[0][1])) {
+                    iStr = ">=" + iStr;
+                }
+                items.push(<div key={i}><i style={{
+                    background: this.props.colorScale[0](i),
+                    width: "18px",
+                    height: "18px",
+                    marginRight: "5px"
+                }}></i>{iStr}</div>)
+            }
+        } else if (typeof (this.props.colorScale == "object")) {// Bivariate
             const dx = (this.props.limits[0][1] - this.props.limits[0][0]) / this.props.steps;
             const dy = (this.props.limits[1][1] - this.props.limits[1][0]) / this.props.steps;
             labels.push(<div key={"label0"}>{this.props.labels[0]}</div>)
@@ -45,7 +61,7 @@ export default class AbsoluteLegend extends React.Component {
         }
 
         var select = ""
-        if (typeof(this.props.colorBy) == "object") {
+        if (typeof (this.props.colorBy) == "object") {
             const options = []
             for (var k in this.props.colorBy) {
                 options.push(<option key={k}>{k}</option>)
@@ -62,6 +78,10 @@ export default class AbsoluteLegend extends React.Component {
             {items}
             Hover over an area to show plots for that area
             {select}
+            <div id="heightWrapper">
+                <input name="height" type="checkbox" checked={this.props.height} onChange={this.props.toggleHeight} disabled={typeof (this.props.colorScale) !== "object"} />
+                <label htmlFor="height">second variable as height</label>
+            </div>
         </div>
     }
 }
