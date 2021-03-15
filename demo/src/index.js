@@ -1,7 +1,7 @@
 // Example app
 import Deckly from "../../src";
 
-const IMD_DOMAINS = ["IMD18_mean", "Access_mean", "Crime_mean", "Education_mean", "Employment_mean", "Health_mean", "Housing_mean", "Income_mean"]
+const IMD_DOMAINS = ["IMD18_mean", "Employment_mean", "Income_mean", "Crime_mean", "Housing_mean", "Health_mean", "Education_mean", "Access_mean"]
 
 const YEAR_BRACKETS = ["2010-2012", "2013-2015", "2016-2018"]
 
@@ -120,15 +120,30 @@ Deckly({
     },
     {
         id: "deprivation",
-        data: data => [
-            {
+        data: data => {
+             // NZ wide context
+            var traces = [{
                 x: IMD_DOMAINS.map(k => k.replace("_mean", "")),
-                y: IMD_DOMAINS.map(k => data.aggregate ? data[k] / 86 : data[k]),
+                y: IMD_DOMAINS.map(k => data.aggregateData[k] / 86),
                 type: 'line',
+                name: "NZ"
+            }];
+            if (!data.aggregate) {
+                // This TALB
+                traces.push({
+                    x: IMD_DOMAINS.map(k => k.replace("_mean", "")),
+                    y: IMD_DOMAINS.map(k => data.aggregate ? data[k] / 86 : data[k]),
+                    type: 'line',
+                    name: data.hoverObject ? data.hoverObject.properties.TALB2018_1 : ""
+                })
             }
-        ],
+            return traces
+        },
         layout: {
-            title: d => `Deprivation in ${d ? d.properties.TALB2018_1 : "NZ"}`,
+            title: d => `Deprivation in ${d ? d.properties.TALB2018_1 + " vs NZ" : "NZ"}`,
+            yaxis: {
+                range: [0, 6000]
+            }
         }
     },
     {
