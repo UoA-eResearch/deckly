@@ -86,8 +86,8 @@ class DecklyComponent extends React.Component {
             legendTitle: legendTitle,
             isLoaded: false,
             per: false,
-            height: true,
-            animating: false,
+            height: true, // if bivariate, should second variable be shown as height?
+            animating: false, // true when shifting between height == True and height == False
             hoverInfo: {},
             limits: this.props.limits,
             selected: null,
@@ -176,16 +176,6 @@ class DecklyComponent extends React.Component {
             colorScale = [chroma.scale(colorScale[0]).domain(this.state.limits[0]), chroma.scale(colorScale[1]).domain(this.state.limits[1])]
         }
 
-        function getE(colorScale) {
-            if (typeof (colorScale) == "object") {
-                console.log(colorScale[1](this.state.accessor(f)[1]) * 10000)
-                return colorScale[1](this.state.accessor(f)[1]) * 10000
-            } else {
-                console.log()
-                return this.state.accessor(f) * 10000
-            }
-        }
-
         const layers = [
             new GeoJsonLayer({
                 id: 'geojson',
@@ -193,16 +183,16 @@ class DecklyComponent extends React.Component {
                 opacity: 0.8,
                 lineWidthUnits: "pixels",
                 lineWidthMinPixels: 1,
-                // stroked: false,
-                // filled: true,
                 extruded: this.state.height || this.state.animating,
                 wireframe: true,
                 getElevation: this.state.height && typeof (colorScale) == "object" ?
                     f => (this.state.accessor(f)[1] - this.state.limits[1][0]) / this.state.limits[1][0] * 20000 : null,
                 getLineWidth: f => f == this.state.selected ? 3 : 1,
-                getFillColor: f => typeof (colorScale) == "object" ?
-                    this.state.height ? colorScale[0](this.state.accessor(f)[0]).rgb() : chroma.blend(colorScale[0](this.state.accessor(f)[0]), colorScale[1](this.state.accessor(f)[1]), "multiply").rgb() :
-                    colorScale(this.state.accessor(f)).rgb(),
+                getFillColor: f => {if (typeof (colorScale) == "object"){
+                    return this.state.height ? colorScale[0](this.state.accessor(f)[0]).rgb() : chroma.blend(colorScale[0](this.state.accessor(f)[0]), colorScale[1](this.state.accessor(f)[1]), "multiply").rgb()
+                } else {
+                    return colorScale(this.state.accessor(f)).rgb()
+                }},
                 getLineColor: f => f == this.state.selected ? [255, 69, 0] : [0, 0, 0],
                 pickable: true,
                 onHover: info => this.state.selected == null ? this.setState({ hoverInfo: info }) : null,
