@@ -2,8 +2,8 @@
 
 <head>
     <!-- Use CDN -->
-    <script src="https://unpkg.com/deckly@1.0.9/umd/deckly.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/deckly@1.0.9/umd/deckly.css">
+    <script src="https://unpkg.com/deckly@1.0.10/umd/deckly.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/deckly@1.0.10/umd/deckly.css">
     <!-- or
     <script src="../umd/deckly.min.js"></script>
     <link rel="stylesheet" href="../umd/deckly.css">
@@ -12,17 +12,26 @@
 
 <body>
     <script>
-        const IMD_DOMAINS = ["IMD18_mean", "Access_mean", "Crime_mean", "Education_mean", "Employment_mean", "Health_mean", "Housing_mean", "Income_mean"]
-        
+        // Example app
+
+        const IMD_DOMAINS = ["IMD18_mean", "Employment_mean", "Income_mean", "Crime_mean", "Housing_mean", "Health_mean", "Education_mean", "Access_mean"]
+
         const YEAR_BRACKETS = ["2010-2012", "2013-2015", "2016-2018"]
-        
+
         Deckly({
             title: "Cancer distribution in NZ",
             data: "https://uoa-eresearch.github.io/cancermap/data/TALB_2018.geojson",
             //colorBy: d => d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
             //colorScale: "Blues",
-            colorBy: d => [d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
-                           d.properties.IMD18_mean],
+            colorBy: {
+                "Bivariate Cancer 2016-2018 + IMD18": d => [
+                    d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
+                    d.properties.IMD18_mean
+                ],
+                "Cancer 2010-2012": d => d.properties.cancer["total 18+ all cancertotal2010-2012"] / d.properties.smoking["total_15+"] * 100,
+                "Cancer 2013-2015": d => d.properties.cancer["total 18+ all cancertotal2013-2015"] / d.properties.smoking["total_15+"] * 100,
+                "Cancer 2016-2018": d => d.properties.cancer["total 18+ all cancertotal2016-2018"] / d.properties.smoking["total_15+"] * 100,
+            },
             colorScale: ["Blues", "Reds"],
             hoverMessage: d => d.properties.TALB2018_1,
             perText: "Display cancer/smoking values as per 100K people",
@@ -43,7 +52,12 @@
                 }
                 return f
             },
-            legendTitle: "Cancer registrations from 2016-2018 divided by 2018 adult population (percentage) vs deprivation",
+            legendTitle: {
+                "Bivariate Cancer 2016-2018 + IMD18": "Cancer registrations from 2016-2018 divided by 2018 adult population (percentage) vs deprivation",
+                "Cancer 2010-2012": "Cancer registrations from 2013-2015 divided by 2018 adult population (percentage)",
+                "Cancer 2013-2015": "Cancer registrations from 2013-2015 divided by 2018 adult population (percentage)",
+                "Cancer 2016-2018": "Cancer registrations from 2016-2018 divided by 2018 adult population (percentage)",
+            },
             legendLabels: ["Cancer →", "Deprivation →"],
             //limits: [1,3],
             plots: [{
@@ -51,7 +65,7 @@
                 style: {
                     width: "50%",
                 },
-                data: ({cancer}) => [ 
+                data: ({ cancer }) => [
                     {
                         name: "Māori",
                         vars: ["breastmaori2016-2018", "prostatemaori2016-2018", "lungmaori2016-2018"],
@@ -77,7 +91,7 @@
                 style: {
                     width: "50%",
                 },
-                data: ({smoking}) => [
+                data: ({ smoking }) => [
                     {
                         name: "Māori",
                         x: ["Male smoker", "Male non-smoker", "Female smoker", "Female non-smoker"],
@@ -98,7 +112,7 @@
             },
             {
                 id: "age_distribution",
-                data: ({age}) => [
+                data: ({ age }) => [
                     {
                         name: "Māori",
                         x: Object.keys(age.Maori).filter(k => k != "Total"),
@@ -119,20 +133,35 @@
             },
             {
                 id: "deprivation",
-                data: data => [
-                    {
+                data: data => {
+                    // NZ wide context
+                    var traces = [{
                         x: IMD_DOMAINS.map(k => k.replace("_mean", "")),
-                        y: IMD_DOMAINS.map(k => data.aggregate ? data[k] / 86 : data[k]),
+                        y: IMD_DOMAINS.map(k => data.aggregateData[k] / 86),
                         type: 'line',
+                        name: "NZ"
+                    }];
+                    if (!data.aggregate) {
+                        // This TALB
+                        traces.push({
+                            x: IMD_DOMAINS.map(k => k.replace("_mean", "")),
+                            y: IMD_DOMAINS.map(k => data.aggregate ? data[k] / 86 : data[k]),
+                            type: 'line',
+                            name: data.hoverObject ? data.hoverObject.properties.TALB2018_1 : ""
+                        })
                     }
-                ],
+                    return traces
+                },
                 layout: {
-                    title: d => `Deprivation in ${d ? d.properties.TALB2018_1 : "NZ"}`,
+                    title: d => `Deprivation in ${d ? d.properties.TALB2018_1 + " vs NZ" : "NZ"}`,
+                    yaxis: {
+                        range: [0, 6000]
+                    }
                 }
             },
             {
                 id: "cancer_over_time",
-                data: ({cancer}) => [
+                data: ({ cancer }) => [
                     {
                         name: "Māori",
                         type: 'bar',
@@ -151,7 +180,7 @@
                     barmode: 'stack'
                 }
             }
-        ]
+            ]
         })
     </script>
 </body>
