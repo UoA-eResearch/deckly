@@ -185,8 +185,9 @@ class DecklyComponent extends React.Component {
                 lineWidthMinPixels: 1,
                 extruded: this.state.height || this.state.animating,
                 wireframe: true,
+                elevationScale: this.props.elevationScale ? this.props.elevationScale : 200000,
                 getElevation: this.state.height && typeof (colorScale) == "object" ?
-                    f => (this.state.accessor(f)[1] - this.state.limits[1][0]) / this.state.limits[1][0] * 20000 : null,
+                    f => (this.state.accessor(f)[1] - this.state.limits[1][0]) / this.state.limits[1][1] : null,
                 getLineWidth: f => f == this.state.selected ? 3 : 1,
                 getFillColor: f => {if (typeof (colorScale) == "object"){
                     return this.state.height ? colorScale[0](this.state.accessor(f)[0]).rgb() : chroma.blend(colorScale[0](this.state.accessor(f)[0]), colorScale[1](this.state.accessor(f)[1]), "multiply").rgb()
