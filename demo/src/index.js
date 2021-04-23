@@ -47,6 +47,7 @@ Deckly({
     },
     legendLabels: ["Cancer →", "Deprivation →"],
     //limits: [1,3],
+    extraPlotData: ["https://raw.githubusercontent.com/UoA-eResearch/cancermap/master/data/DHB/NZ_cancer.csv"],
     plots: [{
         id: "cancertypes",
         style: {
@@ -172,6 +173,28 @@ Deckly({
         ],
         layout: {
             title: d => `Cancer over time in ${d ? d.properties.TALB2018_1 : "NZ"}`,
+            barmode: 'stack'
+        }
+    },
+    {
+        id: "DHB_level",
+        data: ({extraData}) => {
+            var cancer = extraData[0];
+            var years = [2012, 2013, 2014, 2015, 2016, 2017];
+            return [{
+              x: years,
+              y: years.map(year => cancer.filter(r => r.Year == year && r.Cases && r.Sex == "Male").reduce((sum, r) => sum + parseInt(r.Cases), 0)),
+              name: "Male",
+              type: 'bar',
+            }, {
+              x: years,
+              y: years.map(year => cancer.filter(r => r.Year == year && r.Cases && r.Sex == "Female").reduce((sum, r) => sum + parseInt(r.Cases), 0)),
+              name: "Female",
+              type: 'bar',
+            }];
+        },
+        layout: {
+            title: d => `DHB-level cancer over time in NZ`,
             barmode: 'stack'
         }
     }

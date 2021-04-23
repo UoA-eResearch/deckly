@@ -10,6 +10,9 @@ import AbsoluteLegend from './AbsoluteLegend';
 import { WebMercatorViewport } from '@deck.gl/core';
 import bbox from "@turf/bbox";
 import "./custom.css";
+import * as d3 from "d3";
+
+window.d3 = d3
 
 import Plot from 'react-plotly.js'
 
@@ -141,6 +144,13 @@ class DecklyComponent extends React.Component {
                     viewport: getViewStateForBounds(b)
                 })
             });
+        if (this.props.extraPlotData) {
+            Promise.all(this.props.extraPlotData.map(url => d3.csv(url))).then((extraData) =>
+                this.setState({
+                    extraData: extraData
+                })
+            );
+        }
     }
 
     handleInputChange(event) {
@@ -254,6 +264,7 @@ class DecklyComponent extends React.Component {
                                     } else { // Not hovering, show aggregate
                                         var data = this.state.aggregate
                                     }
+                                    data.extraData = this.state.extraData;
                                     if (!p.style) p.style = {}
                                     const DEFAULT_STYLE = {
                                         width: "100%",
