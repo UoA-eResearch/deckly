@@ -179,6 +179,7 @@ Deckly({
     {
         id: "DHB_level",
         data: ({extraData}) => {
+            if (!extraData) return;
             var cancer = extraData[0];
             var years = [2012, 2013, 2014, 2015, 2016, 2017];
             return [{
