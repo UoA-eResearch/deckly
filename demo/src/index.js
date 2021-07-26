@@ -45,7 +45,7 @@ Deckly({
         "Cancer 2013-2015": "Cancer registrations from 2013-2015 divided by 2018 adult population (percentage)",
         "Cancer 2016-2018": "Cancer registrations from 2016-2018 divided by 2018 adult population (percentage)",
     },
-    legendLabels: ["Cancer →", "Deprivation →"],
+    legendLabels: ["Cancer", "Deprivation"],
     //limits: [1,3],
     extraPlotData: ["https://raw.githubusercontent.com/UoA-eResearch/cancermap/master/data/DHB/NZ_cancer.csv"],
     plots: [{

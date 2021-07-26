@@ -29,7 +29,7 @@ export default class AbsoluteLegend extends React.Component {
             labels.push(<div key={"label1"}>{this.props.labels[1]} (height)</div>)
             labels.push(<div key={"label0"} style={{
                 transform: "rotate(90deg) translate(160px, 30px)"
-            }}>{this.props.labels[0]}</div>)
+            }}>{this.props.labels[0]} →</div>)
             for (var i = this.props.limits[0][0]; i <= this.props.limits[0][1]; i += step) {
                 var iStr = i.toLocaleString();
                 if (approxeq(i, this.props.limits[0][0])) {
@@ -48,10 +48,10 @@ export default class AbsoluteLegend extends React.Component {
         } else if (typeof (this.props.colorScale == "object")) {// Bivariate chloropleth
             const dx = (this.props.limits[0][1] - this.props.limits[0][0]) / this.props.steps;
             const dy = (this.props.limits[1][1] - this.props.limits[1][0]) / this.props.steps;
-            labels.push(<div key={"label0"}>{this.props.labels[0]}</div>)
+            labels.push(<div key={"label0"}>{this.props.labels[0]} →</div>)
             labels.push(<div key={"label1"} style={{
                 transform: "rotate(90deg) translate(160px, 30px)"
-            }}>{this.props.labels[1]}</div>)
+            }}>{this.props.labels[1]} →</div>)
             for (var iy = 0; iy < this.props.steps; iy++) {
                 for (var ix = 0; ix < this.props.steps; ix++) {
                     var x = this.props.limits[0][0] + ix * dx;
