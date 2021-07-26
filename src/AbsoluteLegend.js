@@ -23,6 +23,7 @@ export default class AbsoluteLegend extends React.Component {
                     marginRight: "5px"
                 }}></i>{iStr}</div>)
             }
+            items = <div id="grid" key="grid">{items}</div>
         } else if (typeof (this.props.colorScale == "object") && this.props.height) {// Bivariate, second variable as height
             const step = (this.props.limits[0][1] - this.props.limits[0][0]) / this.props.steps;
             labels.push(<div key={"label1"}>{this.props.labels[1]} (height)</div>)
@@ -43,6 +44,7 @@ export default class AbsoluteLegend extends React.Component {
                     marginRight: "5px"
                 }}></i>{iStr}</div>)
             }
+            items = <div id="grid" key="grid">{items}</div>
         } else if (typeof (this.props.colorScale == "object")) {// Bivariate chloropleth
             const dx = (this.props.limits[0][1] - this.props.limits[0][0]) / this.props.steps;
             const dy = (this.props.limits[1][1] - this.props.limits[1][0]) / this.props.steps;
@@ -59,7 +61,7 @@ export default class AbsoluteLegend extends React.Component {
                     }} title={`${x.toLocaleString()},${y.toLocaleString()}`}></i>)
                 }
             }
-            items = <div id="grid" style={{
+            items = <div id="grid" key="grid" style={{
                 gridTemplateColumns: `repeat(${this.props.steps}, 18px)`
             }}>{items}</div>
         }
