@@ -24,7 +24,7 @@
     "chroma-js": "^2.1.0",
     "d3": "^6.7.0",
     "deck.gl": "^8.3.11",
-    "plotly.js": "^1.58.4",
+    "plotly.js": "^2.25.2",
     "react-map-gl": "^5.2.11",
     "react-plotly.js": "^2.5.1",
     "react-reflex": "^3.1.0",
